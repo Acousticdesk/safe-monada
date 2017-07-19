@@ -1,0 +1,28 @@
+{
+  "name": "safe-monada",
+  "version": "1.0.0",
+  "description": "Implementation of MayBe monada",
+  "main": "lib/index.js",
+  "scripts": {
+    "test": "jest --verbose --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pdffiller/safe-monada.git"
+  },
+  "keywords": [
+    "mayby",
+    "safe",
+    "monada"
+  ],
+  "author": "Dmitry Scheglov <dmitry.scheglov@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/pdffiller/safe-monada/issues"
+  },
+  "homepage": "https://github.com/pdffiller/safe-monada#readme",
+  "devDependencies": {
+    "babel-jest": "^20.0.3",
+    "jest": "^20.0.4"
+  }
+}
