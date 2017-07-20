@@ -130,6 +130,9 @@ class _Safe {
     return this.get(name).ensureFunc().map(m => m.bind(obj));
   }
 
+  callMethod(name, ...args) {
+    return this.method(name).call(...args);
+  }
   /**
    * Returns a packed value of field <fld> of the current packed value.
    * if current packed value is Nothing or doesn't have the field <fld>
@@ -212,6 +215,7 @@ class _Safe {
 // Aliases
 _Safe.prototype.end = _Safe.prototype.unpack;
 _Safe.prototype.$m = _Safe.prototype.method;
+_Safe.prototype.$mc = _Safe.prototype.callMethod;
 _Safe.prototype.$u = _Safe.prototype.unpack;
 _Safe.prototype.$e = _Safe.prototype.ensure;
 _Safe.prototype.$ee = _Safe.prototype.ensureEmpty;

@@ -91,14 +91,14 @@ Returns a packed value of field `fld` of the current packed value.
 if current packed value is Nothing or doesn't have the field `fld`
 the packed undefined is returned.
 
-if get is called with any parameters it returns the unpacked value.
+if get is called without any parameters it returns the unpacked value.
 
 
 #### 10. `.set(fld, val)` or `.$(fld, val)`
 
 Creates new object and assigns its field `fld` with value `val`.
 The new object is created as a copy of unpacked value if it is not null
-and its typs is one of: object, array or function. In other cases 
+and its type is one of: object, array or function. In other cases 
 the empty object will be created.
 
 Fucntion returns the packed new object
