@@ -1,9 +1,13 @@
 {
   "name": "safe-monada",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Implementation of MayBe monada",
   "main": "lib/index.js",
   "scripts": {
+    "clear": "rm -rf node_modules; rm -rf lib",
+    "compile": "babel src --out-dir lib",
+    "prepublish": "npm run test && npm run compile",
+    "lint": "eslint ./src && echo \"eslint: ok!\"",
     "test": "jest --verbose --coverage"
   },
   "repository": {
