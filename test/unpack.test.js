@@ -75,7 +75,7 @@ describe('safe(arr: [any]).unpack()', () => {
 
 describe('safe(obj?).unpack()', () => {
   test('should return null for safe(null)', () => {
-    expect(safe(null).unpack()).toBeNull();
+    expect(safe(null).unpack()).toBeUndefined();
   });
 
   test('should return undefined for safe()', () => {

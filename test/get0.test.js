@@ -76,7 +76,7 @@ describe('safe(arr: [any]).get()', () => {
 
 describe('safe(obj?).get()', () => {
   test('should return Symbol for safe(null)', () => {
-    expect(safe(null).get()).toBeNull();
+    expect(safe(null).get()).toBeUndefined();
   });
 
   test('should return Symbol for safe()', () => {

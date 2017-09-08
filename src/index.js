@@ -1,10 +1,13 @@
-import { isFunc, isSettable, defProps, prop } from './helpers';
+import { isFunc, isSettable, safeProps, applyUnpacked, copyObjectForAssign } from './helpers';
+import { $$unpacked, $$private } from './symbols';
 
-
-const smblPrivateObj = Symbol('privateObj');
-const smblSafeMarker = Symbol('safeMarker');
+export { $$unpacked };
+export const __ = $$unpacked;
 
 let _safe = null;
+let _nothing = null;
+const objDefProp = Object.defineProperties;
+
 class _Safe {
   /**
    * Creates an instance of _Safe.
@@ -13,11 +16,7 @@ class _Safe {
    * @memberof _Safe
    */
   constructor(obj) {
-    defProps(this, {
-      [smblPrivateObj]: prop(obj && obj[smblSafeMarker] ? obj.unpack() : obj),
-      [smblSafeMarker]: prop(true),
-      isSafe: prop(true)
-    });
+    return obj != null ? objDefProp(this, safeProps(obj)) : _nothing;
   }
 
   /**
@@ -28,17 +27,29 @@ class _Safe {
    * @returns {any}
    * @memberof _Safe
    */
-  unpack() { return this[smblPrivateObj]; }
+  unpack() { return this[$$private]; }
 
   /**
-   * Returns safe(true) - if packed values is null or underfined, otherwise
-   * returns packed false
+   * Returns true - if packed value is null or underfined, otherwise
+   * returns false
    * 
-   * @returns {_Safe}
+   * @returns {Boolean}
    * @memberof _Safe
    */
   isNothing() {
-    return _safe(this[smblPrivateObj] == null);
+    return this[$$private] == null;
+  }
+
+
+  /**
+   * Returns true -- if packed value is not null and not undefined,
+   * otherwise return false
+   * 
+   * @returns {Boolean}
+   * @memberof _Safe
+   */
+  isNotNothing() {
+    return this[$$private] != null;
   }
 
   /**
@@ -51,7 +62,7 @@ class _Safe {
    * @memberof _Safe
    */
   ensure(def) {
-    const obj = this[smblPrivateObj];
+    const obj = this[$$private];
     return obj != null ? this : _safe(def);
   }
 
@@ -66,7 +77,7 @@ class _Safe {
    * @memberof _Safe
    */
   ensureFalse(def) {
-    const obj = this[smblPrivateObj];
+    const obj = this[$$private];
     return obj ? this : _safe(def);
   }
 
@@ -81,7 +92,7 @@ class _Safe {
    * @memberof _Safe
    */
   ensureFunc(def) {
-    const obj = this[smblPrivateObj];
+    const obj = this[$$private];
     return isFunc(obj) ? this : _safe(def);
   }
 
@@ -96,7 +107,7 @@ class _Safe {
    * @memberof _Safe
    */
   ensureArray(arr) {
-    const obj = this[smblPrivateObj];
+    const obj = this[$$private];
     if (obj == null) return _safe(arr || []);
     return Array.isArray(obj) ? this : _safe(arr || [obj]);
   }
@@ -110,8 +121,8 @@ class _Safe {
    * @memberof _Safe
    */
   call(...args) {
-    const obj = this[smblPrivateObj];
-    return isFunc(obj) ? _safe(obj(...args)) : _safe();
+    const obj = this[$$private];
+    return isFunc(obj) ? _safe(obj(...args)) : _nothing;
   }
 
   /**
@@ -126,7 +137,7 @@ class _Safe {
    * @memberof _Safe
    */
   method(name) {
-    const obj = this[smblPrivateObj];
+    const obj = this[$$private];
     return this.get(name).ensureFunc().map(m => m.bind(obj));
   }
 
@@ -148,8 +159,8 @@ class _Safe {
    */
   get(fld) {
     if (arguments.length === 0) return this.unpack();
-    const obj = this[smblPrivateObj];
-    return obj != null && fld != null ? _safe(obj[fld]) : _safe();
+    const obj = this[$$private];
+    return obj != null && fld != null ? _safe(obj[fld]) : _nothing;
   }
 
   /**
@@ -168,14 +179,7 @@ class _Safe {
    * @memberof _Safe
    */
   set(fld, val) {
-    const obj = this[smblPrivateObj];
-    let newObj;
-
-    if (!isSettable(obj)) newObj = {};
-    else if (Array.isArray(obj)) newObj = obj.slice();
-    else if (isFunc(obj)) newObj = (...args) => obj(...args);
-    else newObj = { ...obj };
-
+    const newObj = copyObjectForAssign(this[$$private]);
     newObj[fld] = val;
     return _safe(newObj);
   }
@@ -190,9 +194,10 @@ class _Safe {
    * @returns {_Safe}
    * @memberof _Safe
    */
-  map(mapper) {
-    const obj = this[smblPrivateObj];
-    return obj != null ? _safe(mapper).call(obj) : _safe();
+  map(mapper, ...args) {
+    const obj = this[$$private];
+    args = applyUnpacked(args, obj);
+    return obj != null ? _safe(mapper).call(...args) : _nothing;
   }
 
 
@@ -232,3 +237,7 @@ _Safe.prototype.$to = _Safe.prototype.map;
 export const safe = obj => new _Safe(obj);
 _safe = safe;
 
+export const Nothing = Object.create(_Safe.prototype, safeProps());
+_nothing = Nothing;
+_safe.Nothing = Nothing;
+_Safe.prototype.Nothing = Nothing;
