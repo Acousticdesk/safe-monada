@@ -1,4 +1,4 @@
-import { isFunc, isSettable, safeProps, applyUnpacked, copyObjectForAssign } from './helpers';
+import { isFunc, safeProps, applyUnpacked, copyObjectForAssign } from './helpers';
 import { $$unpacked, $$private } from './symbols';
 
 export { $$unpacked };
